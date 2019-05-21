@@ -1,0 +1,27 @@
+# .gqlgen.yml example
+#
+# Refer to https://gqlgen.com/config/
+# for detailed .gqlgen.yml documentation.
+
+schema:
+- schema.graphql
+exec:
+  filename: generated.go
+model:
+  filename: models_gen.go
+resolver:
+  filename: resolver.go
+  type: Resolver
+models:
+  Review:
+    model: github.com/monirz/gql/api.Review
+  Screenshot:
+    model: github.com/monirz/gql/api.Screenshot
+  User:
+    model: github.com/monirz/gql/api.User
+  Video:
+    model: github.com/monirz/gql/api.Video
+  ID:
+    model: github.com/monirz/gql/api.ID
+  Timestamp:
+    model: github.com/monirz/gql/api.Timestamp
