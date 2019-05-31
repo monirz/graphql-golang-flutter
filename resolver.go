@@ -159,12 +159,11 @@ func (r *mutationResolver) CreateVideo(ctx context.Context, input NewVideo) (*ap
 type queryResolver struct{ *Resolver }
 
 func (r *queryResolver) Videos(ctx context.Context, limit *int, offset *int) ([]*api.Video, error) {
-	var video api.Video
 	var videos []*api.Video
 
 	// r.db = DB
 	// fmt.Println(r.db)
-	rows, err := dbl.LogAndQuery(r.db, "SELECT id, name, description, url, created_at, user_id FROM videos ORDER BY created_at desc limit ? offset ?", 10, 0)
+	rows, err := dbl.LogAndQuery(r.db, "SELECT id, name, description, url, created_at, user_id FROM videos ORDER BY id desc limit ?", limit)
 	defer rows.Close()
 	fmt.Println("debug ------------------ ", rows)
 	if err != nil {
@@ -173,14 +172,17 @@ func (r *queryResolver) Videos(ctx context.Context, limit *int, offset *int) ([]
 	}
 
 	for rows.Next() {
+		video := api.Video{}
+
 		err := rows.Scan(&video.ID, &video.Name, &video.Description, &video.URL, &video.CreatedAt, &video.UserID)
 
-		fmt.Println("vidoe name ---------------------------------------", video.Name)
+		fmt.Println("vidoe name ---------------------------------------", video)
 		if err != nil {
 			log.Println(err)
 			return nil, err
 		}
 		videos = append(videos, &video)
+
 	}
 
 	return videos, nil

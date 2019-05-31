@@ -1,0 +1,4 @@
+#Fri May 31 20:45:24 BDT 2019
+base.0=/home/monir/flutter_exp/gql/flutter_graphql_demo/build/app/intermediates/transforms/dexMerger/debug/0
+path.0=classes.dex
+renamed.0=classes.dex
