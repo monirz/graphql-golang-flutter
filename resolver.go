@@ -23,6 +23,7 @@ const (
 var DB *sql.DB
 
 var videoPublishedChannel map[string]chan *api.Video
+var userCreatedChannel map[string]chan *api.User
 
 func init() {
 	var err error
@@ -87,6 +88,38 @@ func (r *Resolver) Video() VideoResolver {
 }
 
 type mutationResolver struct{ *Resolver }
+
+func (r *mutationResolver) CreateUser(ctx context.Context, input NewUser) (*api.User, error) {
+	NewUser := &api.User{
+		ID:    input.ID,
+		Name:  input.Name,
+		Email: input.Email,
+	}
+
+	r.db = DB
+	rows, err := dbl.LogAndQuery(r.db, "INSERT INTO users (id ,name, email) VALUES(?, ?, ?)",
+		input.ID, input.Name, input.Email)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for rows.Next() {
+		if err := rows.Scan(&NewUser.ID); err != nil {
+			log.Println(err)
+
+			return nil, err
+		}
+	}
+
+	defer rows.Close()
+
+	for _, observer := range userCreatedChannel {
+		observer <- NewUser
+	}
+	log.Println("new user > ", NewUser)
+
+	return NewUser, err
+}
 
 func (r *mutationResolver) CreateVideo(ctx context.Context, input NewVideo) (*api.Video, error) {
 	newVideo := &api.Video{
@@ -185,6 +218,18 @@ func (r *subscriptionResolver) VideoPublished(ctx context.Context) (<-chan *api.
 	}()
 	videoPublishedChannel[id] = videoEvent
 	return videoEvent, nil
+}
+
+func (r *subscriptionResolver) UserCreated(ctx context.Context) (<-chan *api.User, error) {
+	id := randx.String(8)
+
+	userEvent := make(chan *api.User, 1)
+	go func() {
+		<-ctx.Done()
+	}()
+	userCreatedChannel[id] = userEvent
+	return userEvent, nil
+
 }
 
 type userResolver struct{ *Resolver }
