@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_graphql_demo/client_provider.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:flutter_graphql_demo/videos_subscription.dart';
 
 void main() {
   runApp(MaterialApp(title: "GQL App", home: MyApp()));
@@ -8,20 +10,17 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final HttpLink httpLink =
-        HttpLink(uri: "http://192.168.1.13:8090/query");
-    final ValueNotifier<GraphQLClient> client = ValueNotifier<GraphQLClient>(
-      GraphQLClient(
-        link: httpLink as Link,
-        cache: OptimisticCache(
-          dataIdFromObject: typenameDataIdFromObject,
-        ),
-      ),
-    );
-    return GraphQLProvider(
-      child: HomePage(),
-      client: client,
-    );
+    // final HttpLink httpLink =
+    //     HttpLink(uri: "http://192.168.1.103:8080/query");
+    // final ValueNotifier<GraphQLClient> client = ValueNotifier<GraphQLClient>(
+    //   GraphQLClient(
+    //     link: httpLink as Link,
+    //     cache: OptimisticCache(
+    //       dataIdFromObject: typenameDataIdFromObject,
+    //     ),
+    //   ),
+    // );
+    return ClientProvider(child: HomePage(),uri: "http://192.168.1.103:8080/query",subscriptionUri: "ws://192.168.1.103:8080/query",);
   }
 }
 
@@ -41,31 +40,32 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text("GraphlQL Client"),
       ),
-      body: Query(
-        options: QueryOptions(
-            document: query, pollInterval:20, variables: <String, dynamic>{"limit": 10}),
-        builder: (
-          QueryResult result, {
-          VoidCallback refetch,
-        }) {
-          if (result.loading) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (result.data == null) {
-            return Text("No Data Found !");
-          }
-          print(result.data["Videos"]);
-          return ListView.builder(
-            itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                title:
-                    Text(result.data['Videos'][index]['name']),
-              );
-            },
-            itemCount: result.data["Videos"].length,
-          );
-        },
-      ),
+      body: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        const ListTile(title: Text('Live Stream of Videos')),
+        Expanded(child: VideoFeed()),
+      ],
+    ),
+      // body: Query(
+      //   options: QueryOptions(
+      //       document: query, variables: <String, dynamic>{"limit": 10}),
+      //   builder: (
+      //     QueryResult result, {
+      //     VoidCallback refetch,
+      //   }) {
+      //     if (result.loading) {
+      //       return Center(child: CircularProgressIndicator());
+      //     }
+      //     if (result.data == null) {
+      //       return Text("No Data Found !");
+      //     }
+      //     print(result.data["Videos"]);
+      //     return VideoFeed();
+      //   },
+      // ),
+
     );
   }
 }
