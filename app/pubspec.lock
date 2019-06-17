@@ -63,15 +63,15 @@ packages:
   graphql:
     dependency: "direct main"
     description:
-      path: "../packages/graphql"
-      relative: true
+      path: "/home/schlitzohr/flutter/packages/graphql"
+      relative: false
     source: path
     version: "1.1.0"
   graphql_flutter:
     dependency: "direct main"
     description:
-      path: "../packages/graphql_flutter"
-      relative: true
+      path: "/home/schlitzohr/flutter/packages/graphql_flutter"
+      relative: false
     source: path
     version: "1.1.0"
   graphql_parser:
