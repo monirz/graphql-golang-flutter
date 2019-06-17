@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_graphql_demo/client_provider.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:flutter_graphql_demo/videos_subscription.dart';
+import 'package:flutter_graphql_demo/queries/video_query.dart';
+import 'package:flutter_graphql_demo/queries/videos_subscription.dart';
+import './video.dart';
+
 
 void main() {
   runApp(MaterialApp(title: "GQL App", home: MyApp()));
@@ -10,29 +12,25 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // final HttpLink httpLink =
-    //     HttpLink(uri: "http://192.168.1.103:8080/query");
-    // final ValueNotifier<GraphQLClient> client = ValueNotifier<GraphQLClient>(
-    //   GraphQLClient(
-    //     link: httpLink as Link,
-    //     cache: OptimisticCache(
-    //       dataIdFromObject: typenameDataIdFromObject,
-    //     ),
-    //   ),
-    // );
-    return ClientProvider(child: HomePage(),uri: "http://192.168.1.103:8080/query",subscriptionUri: "ws://192.168.1.103:8080/query",);
+    return  ClientProvider(child: HomePage(),
+              uri: "http://192.168.1.103:8080/query",
+              subscriptionUri: "ws://192.168.1.103:8080/query",
+            );
   }
 }
 
 class HomePage extends StatelessWidget {
 
-  final String query = r"""
-                query GetVideos($limit: Int){
-                          Videos(limit: $limit ){
-                                 name
-                              }
-                          }         
-                  """;
+  List<Video> videoList = [];
+
+
+  // final String query = r"""
+  //               query GetVideos($limit: Int){
+  //                         Videos(limit: $limit ){
+  //                                name
+  //                             }
+  //                         }         
+  //                 """;
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +43,8 @@ class HomePage extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         const ListTile(title: Text('Live Stream of Videos')),
-        Expanded(child: VideoFeed()),
+        Expanded(child: VideoFeed(),),
+        Expanded(child: VideoQuery(videoList: videoList,)),
       ],
     ),
       // body: Query(
