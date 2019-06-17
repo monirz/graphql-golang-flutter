@@ -24,9 +24,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
   graphql_flutter: 
-    path: /home/schlitzohr/flutter/packages/graphql_flutter
+    path: ../packages/graphql_flutter
   graphql:
-    path: /home/schlitzohr/flutter/packages/graphql
+    path: ../packages/graphql
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +76,6 @@ flutter:
   # see https://flutter.io/custom-fonts/#from-packages
 dependency_overrides:
   graphql_flutter: 
-    path: /home/schlitzohr/flutter/packages/graphql_flutter
+    path: ../packages/graphql_flutter
   graphql:
-    path: /home/schlitzohr/flutter/packages/graphql
+    path: ../packages/graphql

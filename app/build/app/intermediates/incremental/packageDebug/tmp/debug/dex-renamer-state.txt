@@ -1,4 +1,4 @@
-#Sun Jun 16 19:29:25 PDT 2019
+#Mon Jun 17 11:14:50 PDT 2019
 base.0=/home/schlitzohr/go/src/github.com/monirz/gql/app/build/app/intermediates/transforms/dexMerger/debug/0
 path.0=classes.dex
 renamed.0=classes.dex
