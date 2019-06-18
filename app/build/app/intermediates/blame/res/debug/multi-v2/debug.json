@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "/home/monir/flutter_exp/gql/flutter_graphql_demo/build/app/intermediates/res/merged/debug/values_values.arsc.flat",
+            "outputFile": "/home/monir/gocode/src/github.com/monirz/gql/app/build/app/intermediates/res/merged/debug/values_values.arsc.flat",
             "map": [
                 {
-                    "source": "/home/monir/flutter_exp/gql/flutter_graphql_demo/android/app/src/main/res/values/styles.xml",
+                    "source": "/home/monir/gocode/src/github.com/monirz/gql/app/android/app/src/main/res/values/styles.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",
