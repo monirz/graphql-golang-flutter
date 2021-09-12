@@ -51,6 +51,7 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
+		CreateUser  func(childComplexity int, input NewUser) int
 		CreateVideo func(childComplexity int, input NewVideo) int
 	}
 
@@ -74,6 +75,7 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
+		UserCreated    func(childComplexity int) int
 		VideoPublished func(childComplexity int) int
 	}
 
@@ -97,6 +99,7 @@ type ComplexityRoot struct {
 
 type MutationResolver interface {
 	CreateVideo(ctx context.Context, input NewVideo) (*api.Video, error)
+	CreateUser(ctx context.Context, input NewUser) (*api.User, error)
 }
 type QueryResolver interface {
 	Videos(ctx context.Context, limit *int, offset *int) ([]*api.Video, error)
@@ -112,6 +115,7 @@ type ScreenshotResolver interface {
 }
 type SubscriptionResolver interface {
 	VideoPublished(ctx context.Context) (<-chan *api.Video, error)
+	UserCreated(ctx context.Context) (<-chan *api.User, error)
 }
 type UserResolver interface {
 	ID(ctx context.Context, obj *api.User) (int64, error)
@@ -137,6 +141,18 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	ec := executionContext{nil, e}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Mutation.createUser":
+		if e.complexity.Mutation.CreateUser == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createUser_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(NewUser)), true
 
 	case "Mutation.createVideo":
 		if e.complexity.Mutation.CreateVideo == nil {
@@ -224,6 +240,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Screenshot.VideoID(childComplexity), true
+
+	case "Subscription.userCreated":
+		if e.complexity.Subscription.UserCreated == nil {
+			break
+		}
+
+		return e.complexity.Subscription.UserCreated(childComplexity), true
 
 	case "Subscription.videoPublished":
 		if e.complexity.Subscription.VideoPublished == nil {
@@ -452,6 +475,12 @@ type Review {
     createdAt: Timestamp!
 }
 
+input NewUser {
+    id: String!
+    name: String!
+    email: String!
+}
+
 input NewVideo {
     name: String!
     description: String!
@@ -475,6 +504,7 @@ input NewReview {
 
 type Mutation {
     createVideo(input: NewVideo!): Video! 
+    createUser(input: NewUser!) : User!
 }
 
 type Query {
@@ -483,6 +513,7 @@ type Query {
 
 type Subscription {
     videoPublished: Video!
+    userCreated: User!
 }
 
 scalar Timestamp
@@ -492,6 +523,20 @@ scalar Timestamp
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) field_Mutation_createUser_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 NewUser
+	if tmp, ok := rawArgs["input"]; ok {
+		arg0, err = ec.unmarshalNNewUser2githubᚗcomᚋmonirzᚋgqlᚐNewUser(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["input"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createVideo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -629,6 +674,40 @@ func (ec *executionContext) _Mutation_createVideo(ctx context.Context, field gra
 	rctx.Result = res
 	ctx = ec.Tracer.StartFieldChildExecution(ctx)
 	return ec.marshalNVideo2ᚖgithubᚗcomᚋmonirzᚋgqlᚋapiᚐVideo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
+	ctx = ec.Tracer.StartFieldExecution(ctx, field)
+	defer func() { ec.Tracer.EndFieldExecution(ctx) }()
+	rctx := &graphql.ResolverContext{
+		Object:   "Mutation",
+		Field:    field,
+		Args:     nil,
+		IsMethod: true,
+	}
+	ctx = graphql.WithResolverContext(ctx, rctx)
+	rawArgs := field.ArgumentMap(ec.Variables)
+	args, err := ec.field_Mutation_createUser_args(ctx, rawArgs)
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	rctx.Args = args
+	ctx = ec.Tracer.StartFieldResolverExecution(ctx, rctx)
+	resTmp := ec.FieldMiddleware(ctx, nil, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return ec.resolvers.Mutation().CreateUser(rctx, args["input"].(NewUser))
+	})
+	if resTmp == nil {
+		if !ec.HasError(rctx) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*api.User)
+	rctx.Result = res
+	ctx = ec.Tracer.StartFieldChildExecution(ctx)
+	return ec.marshalNUser2ᚖgithubᚗcomᚋmonirzᚋgqlᚋapiᚐUser(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _Query_Videos(ctx context.Context, field graphql.CollectedField) graphql.Marshaler {
@@ -986,6 +1065,34 @@ func (ec *executionContext) _Subscription_videoPublished(ctx context.Context, fi
 			graphql.MarshalString(field.Alias).MarshalGQL(w)
 			w.Write([]byte{':'})
 			ec.marshalNVideo2ᚖgithubᚗcomᚋmonirzᚋgqlᚋapiᚐVideo(ctx, field.Selections, res).MarshalGQL(w)
+			w.Write([]byte{'}'})
+		})
+	}
+}
+
+func (ec *executionContext) _Subscription_userCreated(ctx context.Context, field graphql.CollectedField) func() graphql.Marshaler {
+	ctx = graphql.WithResolverContext(ctx, &graphql.ResolverContext{
+		Field: field,
+		Args:  nil,
+	})
+	// FIXME: subscriptions are missing request middleware stack https://github.com/99designs/gqlgen/issues/259
+	//          and Tracer stack
+	rctx := ctx
+	results, err := ec.resolvers.Subscription().UserCreated(rctx)
+	if err != nil {
+		ec.Error(ctx, err)
+		return nil
+	}
+	return func() graphql.Marshaler {
+		res, ok := <-results
+		if !ok {
+			return nil
+		}
+		return graphql.WriterFunc(func(w io.Writer) {
+			w.Write([]byte{'{'})
+			graphql.MarshalString(field.Alias).MarshalGQL(w)
+			w.Write([]byte{':'})
+			ec.marshalNUser2ᚖgithubᚗcomᚋmonirzᚋgqlᚋapiᚐUser(ctx, field.Selections, res).MarshalGQL(w)
 			w.Write([]byte{'}'})
 		})
 	}
@@ -2195,6 +2302,36 @@ func (ec *executionContext) unmarshalInputNewScreenshot(ctx context.Context, v i
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputNewUser(ctx context.Context, v interface{}) (NewUser, error) {
+	var it NewUser
+	var asMap = v.(map[string]interface{})
+
+	for k, v := range asMap {
+		switch k {
+		case "id":
+			var err error
+			it.ID, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "name":
+			var err error
+			it.Name, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "email":
+			var err error
+			it.Email, err = ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNewVideo(ctx context.Context, v interface{}) (NewVideo, error) {
 	var it NewVideo
 	var asMap = v.(map[string]interface{})
@@ -2256,6 +2393,11 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = graphql.MarshalString("Mutation")
 		case "createVideo":
 			out.Values[i] = ec._Mutation_createVideo(ctx, field)
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "createUser":
+			out.Values[i] = ec._Mutation_createUser(ctx, field)
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
@@ -2463,6 +2605,8 @@ func (ec *executionContext) _Subscription(ctx context.Context, sel ast.Selection
 	switch fields[0].Name {
 	case "videoPublished":
 		return ec._Subscription_videoPublished(ctx, fields[0])
+	case "userCreated":
+		return ec._Subscription_userCreated(ctx, fields[0])
 	default:
 		panic("unknown field " + strconv.Quote(fields[0].Name))
 	}
@@ -2885,6 +3029,10 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNNewUser2githubᚗcomᚋmonirzᚋgqlᚐNewUser(ctx context.Context, v interface{}) (NewUser, error) {
+	return ec.unmarshalInputNewUser(ctx, v)
 }
 
 func (ec *executionContext) unmarshalNNewVideo2githubᚗcomᚋmonirzᚋgqlᚐNewVideo(ctx context.Context, v interface{}) (NewVideo, error) {

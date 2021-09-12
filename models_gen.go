@@ -16,6 +16,12 @@ type NewScreenshot struct {
 	Description *string `json:"description"`
 }
 
+type NewUser struct {
+	ID    string `json:"id"`
+	Name  string `json:"name"`
+	Email string `json:"email"`
+}
+
 type NewVideo struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`

@@ -22,10 +22,11 @@ func Connect() (*sql.DB, error) {
 	var err error
 
 	once.Do(func() {
-		db, err = sql.Open("mysql", "root:password@/gqldemo?parseTime=true")
+		db, err = sql.Open("mysql", "root:"+DB_PASSWORD+"@/gqldemo?parseTime=true")
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(err, "here")
 		}
+
 	})
 	log.Println("DB err", err)
 	return db, err
